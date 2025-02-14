@@ -15,8 +15,8 @@ dependencies {
     implementation("org.jboss.weld.se:weld-se-core:5.1.3.Final")
     implementation("io.smallrye:jandex:3.2.3")
 
-    //Base de datos: PostgreSQL
-    implementation("org.postgresql:postgresql:42.7.5")
+    //Base de datos: SQLite
+    implementation("org.xerial:sqlite-jdbc:3.48.0.0")
 
     //implementacion de JPA hibernate
     implementation("org.hibernate:hibernate-core:6.6.4.Final")
@@ -28,6 +28,9 @@ dependencies {
 
     implementation("org.apache.deltaspike.modules:deltaspike-data-module-api:2.0.0")
     runtimeOnly("org.apache.deltaspike.modules:deltaspike-data-module-impl:2.0.0")
+
+    //FlatLaf UI
+    implementation("com.formdev:flatlaf:3.5.4")
 }
 
 sourceSets {
