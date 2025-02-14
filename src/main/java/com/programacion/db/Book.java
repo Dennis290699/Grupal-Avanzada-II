@@ -1,11 +1,10 @@
 package com.programacion.db;
 
+import java.math.BigDecimal;
+
 public class Book {
     private Integer id;
     private String title;
-    private String isbn;
-    private String genre;
-    private String description;
-    private Integer authorId;
-    private Boolean available;
+    private String yearPublication;
+    private BigDecimal price;
 }
