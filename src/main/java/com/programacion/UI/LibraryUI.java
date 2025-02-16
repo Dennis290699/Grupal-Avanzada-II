@@ -1,5 +1,6 @@
 package com.programacion.UI;
 
+import com.programacion.db.Book;
 import com.programacion.repository.AuthorRepository;
 import com.programacion.repository.BookRepository;
 import com.formdev.flatlaf.FlatIntelliJLaf;
@@ -8,11 +9,14 @@ import com.formdev.flatlaf.FlatDarculaLaf;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.RecursiveTask;
+import java.util.List;
 
 public class LibraryUI extends JFrame {
     public LibraryUI(AuthorRepository authorRepository, BookRepository bookRepository) {
         setTitle("Gestor de libros");
-        setSize(800, 600);
+        setSize(850, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
 
@@ -31,6 +35,14 @@ public class LibraryUI extends JFrame {
         menuTheme.add(lightThemeItem);
         menuTheme.add(darkThemeItem);
 
+        // Menú de "Filtros"
+        JMenu menuBooksFilter = new JMenu("Filtros");
+        menuBar.add(menuBooksFilter);
+
+        // Agregar opción para buscar el libro con el precio más alto
+        JMenuItem highestPriceItem = new JMenuItem("Buscar libro con mayor precio");
+        menuBooksFilter.add(highestPriceItem);
+
         // Configurar la acción de cambiar el tema
         lightThemeItem.addActionListener(new ActionListener() {
             @Override
@@ -43,6 +55,14 @@ public class LibraryUI extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 setLookAndFeel(new FlatDarculaLaf());
+            }
+        });
+
+        // Configurar la acción para buscar el libro con el precio más alto
+        highestPriceItem.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                searchHighestPriceBook(bookRepository);
             }
         });
 
@@ -65,6 +85,22 @@ public class LibraryUI extends JFrame {
             SwingUtilities.updateComponentTreeUI(this);  // Actualizar la UI para reflejar el cambio de tema
         } catch (UnsupportedLookAndFeelException e) {
             e.printStackTrace();
+        }
+    }
+
+    private void searchHighestPriceBook(BookRepository bookRepository) {
+        // Llamar al metodo findBookWithHighestPrice() ya definido en BookRepository
+        Book highestPriceBook = bookRepository.findBookWithHighestPrice();
+
+        // Mostrar el resultado
+        if (highestPriceBook != null) {
+            JOptionPane.showMessageDialog(this,
+                    "Libro con el precio más alto: " + highestPriceBook.getTitle() +
+                            "\nPrecio: " + highestPriceBook.getPrice(),
+                    "Resultado",
+                    JOptionPane.INFORMATION_MESSAGE);
+        } else {
+            JOptionPane.showMessageDialog(this, "No se encontraron libros.", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
 }
