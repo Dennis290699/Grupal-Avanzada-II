@@ -17,6 +17,7 @@ public class JpaConfig {
     @Produces
     public EntityManager entityManager() {
         System.out.println("Creando EntityManager...");
+        // Habilitar claves foráneas en SQLite
         return emf.createEntityManager();
     }
 
