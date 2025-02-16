@@ -10,16 +10,18 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.RecursiveTask;
 
 public class BookPanel extends JPanel {
     private final BookRepository bookRepository;
-    private final AuthorRepository authorRepository; // Agregar AuthorRepository
+    private final AuthorRepository authorRepository;
     private JTable table;
     private DefaultTableModel tableModel;
 
-    public BookPanel(BookRepository bookRepository, AuthorRepository authorRepository) { // Agregar AuthorRepository al constructor
+    public BookPanel(BookRepository bookRepository, AuthorRepository authorRepository) {
         this.bookRepository = bookRepository;
-        this.authorRepository = authorRepository; // Inicializar
+        this.authorRepository = authorRepository;
 
         setLayout(new BorderLayout());
 
@@ -33,14 +35,19 @@ public class BookPanel extends JPanel {
         JButton addButton = new JButton("Agregar");
         JButton updateButton = new JButton("Actualizar");
         JButton deleteButton = new JButton("Eliminar");
+//        JButton highestPriceButton = new JButton("Buscar libro más caro");
 
         addButton.addActionListener(e -> addBook());
         updateButton.addActionListener(e -> updateBook());
         deleteButton.addActionListener(e -> deleteBook());
 
+        // Acción para el botón de buscar libro más caro
+//        highestPriceButton.addActionListener(e -> searchHighestPriceBook());
+
         buttonPanel.add(addButton);
         buttonPanel.add(updateButton);
         buttonPanel.add(deleteButton);
+//        buttonPanel.add(highestPriceButton); // Agregar el nuevo botón al panel
 
         add(new JScrollPane(table), BorderLayout.CENTER);
         add(buttonPanel, BorderLayout.SOUTH);
@@ -50,7 +57,15 @@ public class BookPanel extends JPanel {
         tableModel.setRowCount(0);
         List<Book> books = bookRepository.findAll();
         for (Book book : books) {
-            tableModel.addRow(new Object[]{book.getId(), book.getTitle(), book.getIsbn(), book.getYearPublication(), book.getPrice(), book.getAuthor().getId()});
+            String authorName = book.getAuthor() != null ? book.getAuthor().getName() + " " + book.getAuthor().getLastName() : "Desconocido";
+            tableModel.addRow(new Object[]{
+                    book.getId(),
+                    book.getTitle(),
+                    book.getIsbn(),
+                    book.getYearPublication(),
+                    book.getPrice(),
+                    authorName
+            });
         }
     }
 
@@ -185,15 +200,39 @@ public class BookPanel extends JPanel {
     private void deleteBook() {
         int selectedRow = table.getSelectedRow();
         if (selectedRow >= 0) {
-            int id = (int) tableModel.getValueAt(selectedRow, 0);
+            int id = (int) tableModel.getValueAt(selectedRow, 0); // Obtener el ID del libro seleccionado
             int confirm = JOptionPane.showConfirmDialog(this, "¿Estás seguro de eliminar este libro?", "Confirmar eliminación", JOptionPane.YES_NO_OPTION);
 
             if (confirm == JOptionPane.YES_OPTION) {
-                bookRepository.remove(bookRepository.findBy(id));
-                loadBooks();
+                // Buscar el libro por ID
+                Book book = bookRepository.findBy(id);
+                if (book != null) {
+                    // Eliminar el libro
+                    bookRepository.remove(book);  // Usar remove para eliminar el libro
+                    loadBooks(); // Recargar los libros después de eliminar
+                } else {
+                    JOptionPane.showMessageDialog(this, "Libro no encontrado.", "Error", JOptionPane.ERROR_MESSAGE);
+                }
             }
         } else {
             JOptionPane.showMessageDialog(this, "Seleccione un libro para eliminar.", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
+
+//    // Metodo para buscar el libro con el precio más alto
+//    private void searchHighestPriceBook(BookRepository bookRepository) {
+//        // Llamar al metodo findBookWithHighestPrice() ya definido en BookRepository
+//        Book highestPriceBook = bookRepository.findBookWithHighestPrice();
+//
+//        // Mostrar el resultado
+//        if (highestPriceBook != null) {
+//            JOptionPane.showMessageDialog(this,
+//                    "Libro con el precio más alto: " + highestPriceBook.getTitle() +
+//                            "\nPrecio: " + highestPriceBook.getPrice(),
+//                    "Resultado",
+//                    JOptionPane.INFORMATION_MESSAGE);
+//        } else {
+//            JOptionPane.showMessageDialog(this, "No se encontraron libros.", "Error", JOptionPane.ERROR_MESSAGE);
+//        }
+//    }
 }
