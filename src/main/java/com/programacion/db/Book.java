@@ -16,12 +16,16 @@ public class Book {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
+
     @Column(name = "titulo", nullable = false)
     private String title;
+
     @Column(name = "isbn", nullable = false, unique = true)
     private String isbn;
+
     @Column(name = "ano_publicacion", nullable = false)
     private String yearPublication;
+
     @Column(name = "precio", nullable = false)
     private BigDecimal price;
 
