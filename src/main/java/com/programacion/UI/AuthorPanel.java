@@ -145,12 +145,13 @@ public class AuthorPanel extends JPanel {
             if (confirm == JOptionPane.YES_OPTION) {
                 Author author = authorRepository.findBy(id);
                 if (author != null) {
-                    // Desvincular libros del autor antes de eliminar
+                    // Desvincular libros del autor antes de eliminar (si es necesario, o si no quieres que la cascada borre los libros)
                     if (author.getBooks() != null) {
                         for (Book book : author.getBooks()) {
                             book.setAuthor(null);  // Eliminar la referencia al autor en los libros
                         }
                     }
+
                     // Ahora, eliminar el autor
                     authorRepository.remove(author);  // Usar el metodo remove() de DeltaSpike
                     loadAuthors();
@@ -162,4 +163,5 @@ public class AuthorPanel extends JPanel {
             JOptionPane.showMessageDialog(this, "Seleccione un autor para eliminar.", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
+
 }
