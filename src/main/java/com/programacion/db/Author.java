@@ -27,7 +27,7 @@ public class Author {
     private String birthDate;
 
     @Column(name = "nacionalidad", nullable = false)
-    private String nacionality;
+    private String nationality;
 
     @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Book> books;

@@ -9,9 +9,6 @@ import com.formdev.flatlaf.FlatDarculaLaf;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.concurrent.ForkJoinPool;
-import java.util.concurrent.RecursiveTask;
-import java.util.List;
 
 public class LibraryUI extends JFrame {
     public LibraryUI(AuthorRepository authorRepository, BookRepository bookRepository) {
@@ -41,6 +38,7 @@ public class LibraryUI extends JFrame {
 
         // Agregar opción para buscar el libro con el precio más alto
         JMenuItem highestPriceItem = new JMenuItem("Buscar libro con mayor precio");
+
         menuBooksFilter.add(highestPriceItem);
 
         // Configurar la acción de cambiar el tema
@@ -89,10 +87,8 @@ public class LibraryUI extends JFrame {
     }
 
     private void searchHighestPriceBook(BookRepository bookRepository) {
-        // Llamar al metodo findBookWithHighestPrice() ya definido en BookRepository
         Book highestPriceBook = bookRepository.findBookWithHighestPrice();
 
-        // Mostrar el resultado
         if (highestPriceBook != null) {
             JOptionPane.showMessageDialog(this,
                     "Libro con el precio más alto: " + highestPriceBook.getTitle() +

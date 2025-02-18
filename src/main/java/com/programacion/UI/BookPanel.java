@@ -4,6 +4,9 @@ import com.programacion.db.Author;
 import com.programacion.db.Book;
 import com.programacion.repository.AuthorRepository;
 import com.programacion.repository.BookRepository;
+import com.programacion.services.BookService;
+import jakarta.transaction.Transactional;
+import jakarta.enterprise.inject.spi.CDI;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -200,19 +203,21 @@ public class BookPanel extends JPanel {
     private void deleteBook() {
         int selectedRow = table.getSelectedRow();
         if (selectedRow >= 0) {
-            int id = (int) tableModel.getValueAt(selectedRow, 0); // Obtener el ID del libro seleccionado
-            int confirm = JOptionPane.showConfirmDialog(this, "¿Estás seguro de eliminar este libro?", "Confirmar eliminación", JOptionPane.YES_NO_OPTION);
+            int id = (int) tableModel.getValueAt(selectedRow, 0);
+            int confirm = JOptionPane.showConfirmDialog(
+                    this,
+                    "¿Estás seguro de eliminar este libro?",
+                    "Confirmar eliminación",
+                    JOptionPane.YES_NO_OPTION
+            );
 
             if (confirm == JOptionPane.YES_OPTION) {
-                // Buscar el libro por ID
-                Book book = bookRepository.findBy(id);
-                if (book != null) {
-                    // Eliminar el libro
-                    bookRepository.remove(book);  // Usar remove para eliminar el libro
-                    loadBooks(); // Recargar los libros después de eliminar
-                } else {
-                    JOptionPane.showMessageDialog(this, "Libro no encontrado.", "Error", JOptionPane.ERROR_MESSAGE);
-                }
+                // Obtener el servicio gestionado por CDI
+                BookService bookService = CDI.current().select(BookService.class).get();
+                // Llamar al metodo del servicio para eliminar el libro dentro de una transacción
+                bookService.deleteBook(id);
+                // Recargar la tabla
+                loadBooks();
             }
         } else {
             JOptionPane.showMessageDialog(this, "Seleccione un libro para eliminar.", "Error", JOptionPane.ERROR_MESSAGE);

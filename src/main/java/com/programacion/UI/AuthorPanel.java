@@ -1,8 +1,8 @@
 package com.programacion.UI;
 
 import com.programacion.db.Author;
-import com.programacion.db.Book;
 import com.programacion.repository.AuthorRepository;
+
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
@@ -44,7 +44,7 @@ public class AuthorPanel extends JPanel {
         tableModel.setRowCount(0);
         List<Author> authors = authorRepository.findAll();
         for (Author author : authors) {
-            tableModel.addRow(new Object[]{author.getId(), author.getName(), author.getLastName(), author.getBirthDate(), author.getNacionality()});
+            tableModel.addRow(new Object[]{author.getId(), author.getName(), author.getLastName(), author.getBirthDate(), author.getNationality()});
         }
     }
 
@@ -80,7 +80,7 @@ public class AuthorPanel extends JPanel {
             author.setName(name);
             author.setLastName(lastName);
             author.setBirthDate(birthDate);
-            author.setNacionality(nationality);
+            author.setNationality(nationality);
 
             authorRepository.save(author);
             loadAuthors();
@@ -101,7 +101,7 @@ public class AuthorPanel extends JPanel {
             JTextField nameField = new JTextField(author.getName());
             JTextField lastNameField = new JTextField(author.getLastName());
             JTextField birthDateField = new JTextField(author.getBirthDate());
-            JTextField nationalityField = new JTextField(author.getNacionality());
+            JTextField nationalityField = new JTextField(author.getNationality());
 
             JPanel panel = new JPanel(new GridLayout(4, 2));
             panel.add(new JLabel("Nombre:"));
@@ -128,7 +128,7 @@ public class AuthorPanel extends JPanel {
                 author.setName(name);
                 author.setLastName(lastName);
                 author.setBirthDate(birthDate);
-                author.setNacionality(nationality);
+                author.setNationality(nationality);
                 authorRepository.save(author);
                 loadAuthors();
             }
@@ -136,32 +136,56 @@ public class AuthorPanel extends JPanel {
             JOptionPane.showMessageDialog(this, "Seleccione un autor para actualizar.");
         }
     }
+
     private void deleteAuthor() {
         int selectedRow = table.getSelectedRow();
         if (selectedRow >= 0) {
             int id = (int) tableModel.getValueAt(selectedRow, 0);
-            int confirm = JOptionPane.showConfirmDialog(this, "¿Estás seguro de eliminar este autor?", "Confirmar eliminación", JOptionPane.YES_NO_OPTION);
+            int confirm = JOptionPane.showConfirmDialog(this,
+                    "¿Estás seguro de eliminar este autor?",
+                    "Confirmar eliminación",
+                    JOptionPane.YES_NO_OPTION);
 
             if (confirm == JOptionPane.YES_OPTION) {
                 Author author = authorRepository.findBy(id);
                 if (author != null) {
-                    // Desvincular libros del autor antes de eliminar (si es necesario, o si no quieres que la cascada borre los libros)
-                    if (author.getBooks() != null) {
-                        for (Book book : author.getBooks()) {
-                            book.setAuthor(null);  // Eliminar la referencia al autor en los libros
-                        }
+                    // Verificar si el autor tiene libros asociados
+                    if (author.getBooks() != null && !author.getBooks().isEmpty()) {
+                        // Mostrar ventana con mensaje de error
+                        JOptionPane.showMessageDialog(this,
+                                "No se puede eliminar el autor porque tiene libros asociados.\n" +
+                                        "Elimine o reasigne sus libros antes de intentar eliminarlo.",
+                                "Error de eliminación",
+                                JOptionPane.ERROR_MESSAGE);
+                        return;
                     }
 
-                    // Ahora, eliminar el autor
-                    authorRepository.remove(author);  // Usar el metodo remove() de DeltaSpike
-                    loadAuthors();
+                    try {
+                        authorRepository.remove(author);
+                        loadAuthors();
+                        JOptionPane.showMessageDialog(this,
+                                "Autor eliminado con éxito.",
+                                "Éxito",
+                                JOptionPane.INFORMATION_MESSAGE);
+                    } catch (Exception ex) {
+                        JOptionPane.showMessageDialog(this,
+                                "No se puede eliminar el autor porque tiene libros asociados.\n" +
+                                        "Elimine o reasigne sus libros antes de intentar eliminarlo.",
+                                "Error de eliminación",
+                                JOptionPane.ERROR_MESSAGE);
+                    }
                 } else {
-                    JOptionPane.showMessageDialog(this, "Autor no encontrado.", "Error", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(this,
+                            "Autor no encontrado.",
+                            "Error",
+                            JOptionPane.ERROR_MESSAGE);
                 }
             }
         } else {
-            JOptionPane.showMessageDialog(this, "Seleccione un autor para eliminar.", "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this,
+                    "Seleccione un autor para eliminar.",
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
         }
     }
-
 }

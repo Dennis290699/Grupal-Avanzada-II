@@ -4,7 +4,6 @@ import com.programacion.db.Book;
 import org.apache.deltaspike.data.api.EntityRepository;
 import org.apache.deltaspike.data.api.Repository;
 
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.concurrent.RecursiveTask;
 import java.util.concurrent.ForkJoinPool;
@@ -12,6 +11,7 @@ import java.util.concurrent.ForkJoinPool;
 @Repository
 public interface BookRepository extends EntityRepository<Book, Integer> {
     List<Book> findBooksByAuthor(String authorName);
+
     Book findBookByIsbn(String isbn);
 
     // Metodo para obtener el libro con el precio más alto utilizando ForkJoin
